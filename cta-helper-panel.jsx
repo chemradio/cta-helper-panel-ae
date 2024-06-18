@@ -63,6 +63,18 @@ var imgUberscript = "\u0089PNG\r\n\x1A\n\x00\x00\x00\rIHDR\x00\x00\x00\x19\x00\x
             var closeWipeButton = horGrWipes.add('iconbutton', undefined, ScriptUI.newImage(imgCloseWipe));
             closeWipeButton.onClick = function () { applyWipePreset('close'); };
 
+            // trim paths
+            var horGrTrims = groupOne.add('group');
+            horGrTrims.orientation = 'row';
+
+            var trimOpen = horGrTrims.add('button', undefined, 'trimOpen');
+            trimOpen.onClick = function () { applyTrimPaths('open'); };
+
+            var trimClose = horGrTrims.add('button', undefined, 'trimClose');
+            trimClose.onClick = function () { applyTrimPaths('close'); };
+
+
+
             var sep2 = groupOne.add('panel');
             sep2.alignment = 'fill';
 
@@ -675,4 +687,35 @@ function fitImageToComp() {
 function createTemplate() {
     x = 1;
     return
+}
+
+
+function applyTrimPaths(type) {
+    if (!checkLayerSelected()) { return; }
+    layers = app.project.activeItem.selectedLayers;
+    var wipeDuration = 1.3;
+
+    for (var i = 0; i < layers.length; i++) {
+        var playheadTime = app.project.activeItem.time;
+        wipeTargetLayer = layers[i];
+        var trimPaths = wipeTargetLayer.property("ADBE Root Vectors Group").addProperty("ADBE Vector Filter - Trim");
+
+        var easeIn = new KeyframeEase(0, 100);
+        var easeOut = new KeyframeEase(0, 33);
+
+        if (type == "open") {
+            trimPaths.name = "trimPathsOpen";
+            var targetProp = trimPaths.property('End');
+            targetProp.setValueAtTime(playheadTime,0)
+            targetProp.setValueAtTime(playheadTime+wipeDuration,100)
+        } else if (type == "close") {
+            trimPaths.name = "trimPathsClose";
+            var targetProp = trimPaths.property('Start');
+            targetProp.setValueAtTime(playheadTime,0)
+            targetProp.setValueAtTime(playheadTime+wipeDuration,100)
+        }
+
+        targetProp.setTemporalEaseAtKey(1, [easeOut]);
+        targetProp.setTemporalEaseAtKey(2, [easeIn]);
+    }
 }
