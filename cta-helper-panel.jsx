@@ -5,7 +5,7 @@ var scriptFile = new File($.fileName);
 var scriptPath = scriptFile.parent.fsName;
 
 
-var pathToUberScript = scriptPath + '\\CTA-GFX-Automator.jsxbin';
+var pathToUberScript = scriptPath + '\\CTA-GFX-Automator.jsx';
 var pathToAeTemplate = ''
 
 // UI Icons
